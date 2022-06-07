@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
@@ -15,18 +14,14 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 
-import com.capgemini.ccsw.tutorial.author.model.AuthorDto;
-import com.capgemini.ccsw.tutorial.author.model.AuthorSearchDto;
 import com.capgemini.ccsw.tutorial.customer.model.CustomerDto;
 import com.capgemini.ccsw.tutorial.game.model.GameDto;
 import com.capgemini.ccsw.tutorial.loan.model.LoanDto;
-import com.capgemini.ccsw.tutorial.loan.model.LoanSearchDto;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -38,24 +33,20 @@ public class LoanIT {
 	private static final String GAME_PARAM = "idGame";
 	private static final String CUSTOMER_PARAM = "idCustomer";
 	private static final String LOAN_DATE = "loanDate";
+	private static final String PAGE_NUMBER = "pageNumber";
+	private static final String PAGE_SIZE = "pageSize";
 
 	private static final Long EXISTING_GAME_ID = 6L;
 	private static final Long EXISTING_CUSTOMER_ID = 2L;
 
-	private static String loanDate = "2022-05-18";
 	@SuppressWarnings("deprecation")
 	private static final Date EXISTING_LOAN_DATE = new Date();
 
 	private static final Long NO_EXISTING_GAME_ID = 9L;
 	private static final Long NO_EXISTING_CUSTOMER_ID = 7L;
 
-	private static String loanDate2 = "2022-06-01";
-
 	@SuppressWarnings("deprecation")
 	private static final Date NO_EXISTING_LOAN_DATE = new Date();
-
-	private static final int PAGE_SIZE = 0;
-	private static final Long TOTAL_lOANS = 0L;
 
 	@LocalServerPort
 	private int port;
@@ -66,61 +57,70 @@ public class LoanIT {
 	ParameterizedTypeReference<Page<LoanDto>> responseTypePage = new ParameterizedTypeReference<Page<LoanDto>>() {
 	};
 
-	ParameterizedTypeReference<Page<LoanDto>> responseTypePagePage = new ParameterizedTypeReference<Page<LoanDto>>(){};
-	
+	ParameterizedTypeReference<Page<LoanDto>> responseTypePagePage = new ParameterizedTypeReference<Page<LoanDto>>() {
+	};
+
 	@Test
 	public void findWithoutFiltersShouldReturnAllLoansInDB() {
 
 		int LOANS_WITH_FILTER = 6;
-		long TOTAL_lOANS=6;
+		long TOTAL_lOANS = 6;
 
-		LoanSearchDto searchDto = new LoanSearchDto();
-		searchDto.setPageable(PageRequest.of(0, 6));
+		Map<String, Object> params = new HashMap<>();
+		params.put(GAME_PARAM, null);
+		params.put(CUSTOMER_PARAM, null);
+		params.put(LOAN_DATE, null);
+		params.put(PAGE_NUMBER, 0);
+		params.put(PAGE_SIZE, 5);
 
-		ResponseEntity<Page<LoanDto>> response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.POST,
-				new HttpEntity<>(searchDto), responseTypePagePage);
+		ResponseEntity<Page<LoanDto>> response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.GET,
+				null, responseTypePagePage, params);
 
-		 assertNotNull(response);
-         assertEquals(TOTAL_lOANS, response.getBody().getTotalElements());
-         assertEquals(LOANS_WITH_FILTER, response.getBody().getContent().size());
+		assertNotNull(response);
+		assertEquals(TOTAL_lOANS, response.getBody().getTotalElements());
+		assertEquals(LOANS_WITH_FILTER, response.getBody().getContent().size());
 	}
 
 	@Test
 	public void findExistsGameShouldReturnLoans() {
 
 		int LOANS_WITH_FILTER = 1;
-		long TOTAL_lOANS=5L;
+		long TOTAL_lOANS = 5L;
 
 		Map<String, Object> params = new HashMap<>();
 		params.put(GAME_PARAM, EXISTING_GAME_ID);
 		params.put(CUSTOMER_PARAM, null);
 		params.put(LOAN_DATE, null);
+		params.put(PAGE_NUMBER, 0);
+		params.put(PAGE_SIZE, 5);
 
 		ResponseEntity<Page<LoanDto>> response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.GET,
 				null, responseTypePage, params);
 
 		assertNotNull(response);
 		assertEquals(TOTAL_lOANS, response.getBody().getTotalElements());
-        assertEquals(LOANS_WITH_FILTER, response.getBody().getContent().size());
+		assertEquals(LOANS_WITH_FILTER, response.getBody().getContent().size());
 	}
 
 	@Test
 	public void findExistsCustomShouldReturnLoans() {
 
 		int LOANS_WITH_FILTER = 3;
-		long TOTAL_lOANS=5;
+		long TOTAL_lOANS = 5;
 
 		Map<String, Object> params = new HashMap<>();
 		params.put(GAME_PARAM, null);
 		params.put(CUSTOMER_PARAM, EXISTING_CUSTOMER_ID);
 		params.put(LOAN_DATE, null);
+		params.put(PAGE_NUMBER, 0);
+		params.put(PAGE_SIZE, 5);
 
 		ResponseEntity<Page<LoanDto>> response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.GET,
 				null, responseTypePage, params);
 
 		assertNotNull(response);
 		assertEquals(TOTAL_lOANS, response.getBody().getTotalElements());
-        assertEquals(LOANS_WITH_FILTER, response.getBody().getContent().size());
+		assertEquals(LOANS_WITH_FILTER, response.getBody().getContent().size());
 	}
 
 	@SuppressWarnings("deprecation")
@@ -128,7 +128,7 @@ public class LoanIT {
 	public void findExistsLoanDateShouldReturnLoans() {
 
 		int LOANS_WITH_FILTER = 5;
-		Long TOTAL_lOANS=5L;
+		Long TOTAL_lOANS = 5L;
 
 		EXISTING_LOAN_DATE.setDate(15);
 		EXISTING_LOAN_DATE.setMonth(5);
@@ -138,39 +138,43 @@ public class LoanIT {
 		params.put(GAME_PARAM, null);
 		params.put(CUSTOMER_PARAM, null);
 		params.put(LOAN_DATE, EXISTING_LOAN_DATE);
+		params.put(PAGE_NUMBER, 0);
+		params.put(PAGE_SIZE, 5);
 
 		ResponseEntity<Page<LoanDto>> response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.GET,
 				null, responseTypePage, params);
 
 		assertNotNull(response);
 		assertEquals(TOTAL_lOANS, response.getBody().getTotalElements());
-        assertEquals(LOANS_WITH_FILTER, response.getBody().getContent().size());
+		assertEquals(LOANS_WITH_FILTER, response.getBody().getContent().size());
 	}
 
 	@Test
 	public void findExistsGameAndCustomerShouldReturnLoans() {
 
 		int LOANS_WITH_FILTER = 1;
-		Long TOTAL_lOANS=5L;
+		Long TOTAL_lOANS = 5L;
 
 		Map<String, Object> params = new HashMap<>();
 		params.put(GAME_PARAM, EXISTING_GAME_ID);
 		params.put(CUSTOMER_PARAM, EXISTING_CUSTOMER_ID);
 		params.put(LOAN_DATE, null);
+		params.put(PAGE_NUMBER, 0);
+		params.put(PAGE_SIZE, 5);
 
 		ResponseEntity<Page<LoanDto>> response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.GET,
 				null, responseTypePage, params);
 
 		assertNotNull(response);
 		assertEquals(TOTAL_lOANS, response.getBody().getTotalElements());
-        assertEquals(LOANS_WITH_FILTER, response.getBody().getContent().size());
+		assertEquals(LOANS_WITH_FILTER, response.getBody().getContent().size());
 	}
 
 	@Test
 	public void findExistsGameAndLoanDateShouldReturnLoans() {
 
 		int LOANS_WITH_FILTER = 5;
-		Long TOTAL_lOANS=5L;
+		Long TOTAL_lOANS = 5L;
 
 		EXISTING_LOAN_DATE.setDate(15);
 		EXISTING_LOAN_DATE.setMonth(5);
@@ -180,20 +184,22 @@ public class LoanIT {
 		params.put(GAME_PARAM, EXISTING_GAME_ID);
 		params.put(CUSTOMER_PARAM, null);
 		params.put(LOAN_DATE, EXISTING_LOAN_DATE);
+		params.put(PAGE_NUMBER, 0);
+		params.put(PAGE_SIZE, 5);
 
 		ResponseEntity<Page<LoanDto>> response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.GET,
 				null, responseTypePage, params);
 
 		assertNotNull(response);
 		assertEquals(TOTAL_lOANS, response.getBody().getTotalElements());
-        assertEquals(LOANS_WITH_FILTER, response.getBody().getContent().size());
+		assertEquals(LOANS_WITH_FILTER, response.getBody().getContent().size());
 	}
 
 	@Test
 	public void findExistsCustomerAndLoanDateShouldReturnLoans() {
 
 		int LOANS_WITH_FILTER = 5;
-		Long TOTAL_lOANS=5L;
+		Long TOTAL_lOANS = 5L;
 
 		EXISTING_LOAN_DATE.setDate(15);
 		EXISTING_LOAN_DATE.setMonth(5);
@@ -203,58 +209,64 @@ public class LoanIT {
 		params.put(GAME_PARAM, null);
 		params.put(CUSTOMER_PARAM, EXISTING_CUSTOMER_ID);
 		params.put(LOAN_DATE, EXISTING_LOAN_DATE);
+		params.put(PAGE_NUMBER, 0);
+		params.put(PAGE_SIZE, 5);
 
 		ResponseEntity<Page<LoanDto>> response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.GET,
 				null, responseTypePage, params);
 
 		assertNotNull(response);
 		assertEquals(TOTAL_lOANS, response.getBody().getTotalElements());
-        assertEquals(LOANS_WITH_FILTER, response.getBody().getContent().size());
+		assertEquals(LOANS_WITH_FILTER, response.getBody().getContent().size());
 	}
 
 	@Test
 	public void findNotExistsGameShouldReturnEmpty() {
 
 		int LOANS_WITH_FILTER = 5;
-		Long TOTAL_lOANS=5L;
+		Long TOTAL_lOANS = 5L;
 
 		Map<String, Object> params = new HashMap<>();
 		params.put(GAME_PARAM, NO_EXISTING_GAME_ID);
 		params.put(CUSTOMER_PARAM, null);
 		params.put(LOAN_DATE, null);
+		params.put(PAGE_NUMBER, 0);
+		params.put(PAGE_SIZE, 5);
 
 		ResponseEntity<Page<LoanDto>> response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.GET,
 				null, responseTypePage, params);
 
 		assertNotNull(response);
 		assertEquals(TOTAL_lOANS, response.getBody().getTotalElements());
-        assertEquals(LOANS_WITH_FILTER, response.getBody().getContent().size());
+		assertEquals(LOANS_WITH_FILTER, response.getBody().getContent().size());
 	}
 
 	@Test
 	public void findNotExistsCustomerShouldReturnEmpty() {
 
 		int LOANS_WITH_FILTER = 5;
-		Long TOTAL_lOANS=5L;
+		Long TOTAL_lOANS = 5L;
 
 		Map<String, Object> params = new HashMap<>();
 		params.put(GAME_PARAM, null);
 		params.put(CUSTOMER_PARAM, NO_EXISTING_CUSTOMER_ID);
 		params.put(LOAN_DATE, null);
+		params.put(PAGE_NUMBER, 0);
+		params.put(PAGE_SIZE, 5);
 
 		ResponseEntity<Page<LoanDto>> response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.GET,
 				null, responseTypePage, params);
 
 		assertNotNull(response);
 		assertEquals(TOTAL_lOANS, response.getBody().getTotalElements());
-        assertEquals(LOANS_WITH_FILTER, response.getBody().getContent().size());
+		assertEquals(LOANS_WITH_FILTER, response.getBody().getContent().size());
 	}
 
 	@Test
 	public void findNotExistsTitleOrCategoryOrLoanDateShouldReturnEmpty() {
 
 		int LOANS_WITH_FILTER = 5;
-		Long TOTAL_lOANS=5L;
+		Long TOTAL_lOANS = 5L;
 
 		NO_EXISTING_LOAN_DATE.setDate(1);
 		NO_EXISTING_LOAN_DATE.setMonth(6);
@@ -264,66 +276,86 @@ public class LoanIT {
 		params.put(GAME_PARAM, NO_EXISTING_GAME_ID);
 		params.put(CUSTOMER_PARAM, NO_EXISTING_CUSTOMER_ID);
 		params.put(LOAN_DATE, NO_EXISTING_LOAN_DATE);
+		params.put(PAGE_NUMBER, 0);
+		params.put(PAGE_SIZE, 5);
 
 		ResponseEntity<Page<LoanDto>> response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.GET,
 				null, responseTypePage, params);
 		assertNotNull(response);
 		assertEquals(TOTAL_lOANS, response.getBody().getTotalElements());
-        assertEquals(LOANS_WITH_FILTER, response.getBody().getContent().size());
+		assertEquals(LOANS_WITH_FILTER, response.getBody().getContent().size());
 
 		params.put(GAME_PARAM, NO_EXISTING_GAME_ID);
 		params.put(CUSTOMER_PARAM, EXISTING_CUSTOMER_ID);
 		params.put(LOAN_DATE, NO_EXISTING_LOAN_DATE);
+		params.put(PAGE_NUMBER, 0);
+		params.put(PAGE_SIZE, 5);
 
-		response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.GET, null, responseTypePage, params);
+		response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.GET, null, responseTypePage,
+				params);
 		assertNotNull(response);
 		assertEquals(TOTAL_lOANS, response.getBody().getTotalElements());
-        assertEquals(LOANS_WITH_FILTER, response.getBody().getContent().size());
+		assertEquals(LOANS_WITH_FILTER, response.getBody().getContent().size());
 
 		params.put(GAME_PARAM, NO_EXISTING_GAME_ID);
 		params.put(CUSTOMER_PARAM, EXISTING_CUSTOMER_ID);
 		params.put(LOAN_DATE, EXISTING_LOAN_DATE);
+		params.put(PAGE_NUMBER, 0);
+		params.put(PAGE_SIZE, 5);
 
-		response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.GET, null, responseTypePage, params);
+		response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.GET, null, responseTypePage,
+				params);
 		assertNotNull(response);
 		assertEquals(TOTAL_lOANS, response.getBody().getTotalElements());
-        assertEquals(LOANS_WITH_FILTER, response.getBody().getContent().size());
-        
+		assertEquals(LOANS_WITH_FILTER, response.getBody().getContent().size());
+
 		params.put(GAME_PARAM, NO_EXISTING_GAME_ID);
 		params.put(CUSTOMER_PARAM, NO_EXISTING_CUSTOMER_ID);
 		params.put(LOAN_DATE, EXISTING_LOAN_DATE);
+		params.put(PAGE_NUMBER, 0);
+		params.put(PAGE_SIZE, 5);
 
-		response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.GET, null, responseTypePage, params);
+		response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.GET, null, responseTypePage,
+				params);
 		assertNotNull(response);
 		assertEquals(TOTAL_lOANS, response.getBody().getTotalElements());
-        assertEquals(LOANS_WITH_FILTER, response.getBody().getContent().size());
+		assertEquals(LOANS_WITH_FILTER, response.getBody().getContent().size());
 
 		params.put(GAME_PARAM, EXISTING_GAME_ID);
 		params.put(CUSTOMER_PARAM, NO_EXISTING_CUSTOMER_ID);
 		params.put(LOAN_DATE, NO_EXISTING_LOAN_DATE);
+		params.put(PAGE_NUMBER, 0);
+		params.put(PAGE_SIZE, 5);
 
-		response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.GET, null, responseTypePage, params);
+		response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.GET, null, responseTypePage,
+				params);
 		assertNotNull(response);
 		assertEquals(TOTAL_lOANS, response.getBody().getTotalElements());
-        assertEquals(LOANS_WITH_FILTER, response.getBody().getContent().size());
+		assertEquals(LOANS_WITH_FILTER, response.getBody().getContent().size());
 
 		params.put(GAME_PARAM, EXISTING_GAME_ID);
 		params.put(CUSTOMER_PARAM, NO_EXISTING_CUSTOMER_ID);
 		params.put(LOAN_DATE, EXISTING_LOAN_DATE);
+		params.put(PAGE_NUMBER, 0);
+		params.put(PAGE_SIZE, 5);
 
-		response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.GET, null, responseTypePage, params);
+		response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.GET, null, responseTypePage,
+				params);
 		assertNotNull(response);
 		assertEquals(TOTAL_lOANS, response.getBody().getTotalElements());
-        assertEquals(LOANS_WITH_FILTER, response.getBody().getContent().size());
+		assertEquals(LOANS_WITH_FILTER, response.getBody().getContent().size());
 
 		params.put(GAME_PARAM, EXISTING_GAME_ID);
 		params.put(CUSTOMER_PARAM, NO_EXISTING_CUSTOMER_ID);
 		params.put(LOAN_DATE, NO_EXISTING_LOAN_DATE);
+		params.put(PAGE_NUMBER, 0);
+		params.put(PAGE_SIZE, 5);
 
-		response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.GET, null, responseTypePage, params);
+		response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.GET, null, responseTypePage,
+				params);
 		assertNotNull(response);
 		assertEquals(TOTAL_lOANS, response.getBody().getTotalElements());
-        assertEquals(LOANS_WITH_FILTER, response.getBody().getContent().size());
+		assertEquals(LOANS_WITH_FILTER, response.getBody().getContent().size());
 
 	}
 

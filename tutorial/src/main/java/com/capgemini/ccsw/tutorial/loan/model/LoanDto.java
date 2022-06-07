@@ -2,8 +2,6 @@ package com.capgemini.ccsw.tutorial.loan.model;
 
 import java.util.Date;
 
-import com.capgemini.ccsw.tutorial.author.model.AuthorDto;
-import com.capgemini.ccsw.tutorial.category.model.CategoryDto;
 import com.capgemini.ccsw.tutorial.customer.model.CustomerDto;
 import com.capgemini.ccsw.tutorial.game.model.GameDto;
 
