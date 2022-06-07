@@ -25,10 +25,9 @@ INSERT INTO GAME(id, title, age, category_id, author_id) VALUES (5, 'Los viajes 
 INSERT INTO GAME(id, title, age, category_id, author_id) VALUES (6, 'Azul', '8', 3, 5);
 
 
-INSERT INTO LOAN(id, game_id, customer_id, start_date, end_date) VALUES (1, 1, 2, '2022-05-05', '2022-05-19');
-INSERT INTO LOAN(id, game_id, customer_id, start_date, end_date) VALUES (2, 3, 1, '2022-05-05', '2022-05-12');
-INSERT INTO LOAN(id, game_id, customer_id, start_date, end_date) VALUES (3, 4, 4, '2022-05-12', '2022-05-22');
-INSERT INTO LOAN(id, game_id, customer_id, start_date, end_date) VALUES (4, 6, 2, '2022-05-13', '2022-05-23');
-INSERT INTO LOAN(id, game_id, customer_id, start_date, end_date) VALUES (5, 2, 2, '2022-05-14', '2022-05-24');
-INSERT INTO LOAN(id, game_id, customer_id, start_date, end_date) VALUES (6, 3, 3, '2022-05-15', '2022-05-25');
-
+INSERT INTO LOAN(id, game_id, customer_id, start_date, end_date) VALUES (1, 1, 2, '2022-06-05T23:00:00.000', '2022-06-19T23:00:00.000');
+INSERT INTO LOAN(id, game_id, customer_id, start_date, end_date) VALUES (2, 3, 1, '2022-06-05T23:00:00.000', '2022-06-12T23:00:00.000');
+INSERT INTO LOAN(id, game_id, customer_id, start_date, end_date) VALUES (3, 4, 4, '2022-06-12T23:00:00.000', '2022-06-22T23:00:00.000');
+INSERT INTO LOAN(id, game_id, customer_id, start_date, end_date) VALUES (4, 6, 2, '2022-06-13T23:00:00.000', '2022-06-23T23:00:00.000');
+INSERT INTO LOAN(id, game_id, customer_id, start_date, end_date) VALUES (5, 2, 2, '2022-06-14T23:00:00.000', '2022-06-24T23:00:00.000');
+INSERT INTO LOAN(id, game_id, customer_id, start_date, end_date) VALUES (6, 3, 3, '2022-06-15T23:00:00.000', '2022-06-25T23:00:00.000');

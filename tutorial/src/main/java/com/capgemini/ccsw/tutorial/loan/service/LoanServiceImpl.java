@@ -5,19 +5,13 @@ import java.util.List;
 
 import javax.transaction.Transactional;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.capgemini.ccsw.tutorial.author.model.AuthorDto;
-import com.capgemini.ccsw.tutorial.author.model.AuthorSearchDto;
 import com.capgemini.ccsw.tutorial.customer.service.CustomerService;
-import com.capgemini.ccsw.tutorial.game.GameRepository;
-import com.capgemini.ccsw.tutorial.game.model.Game;
-import com.capgemini.ccsw.tutorial.game.model.GameDto;
 import com.capgemini.ccsw.tutorial.game.service.GameService;
 import com.capgemini.ccsw.tutorial.loan.LoanRepository;
 import com.capgemini.ccsw.tutorial.loan.model.Loan;
@@ -77,7 +71,7 @@ public class LoanServiceImpl implements LoanService {
 			} else {
 				// Comprobación de que un cliente no tiene más de 2 juegos prestado en una fecha
 				// de inicio de prestamo.
-				if (this.loanRepository.findCustomer(dto.getCustomer().getId(), dto.getStart()).size() > 2) {
+				if (this.loanRepository.findCustomer(dto.getCustomer().getId(), dto.getStart()).size() >= 2) {
 					return false;
 				}
 			}

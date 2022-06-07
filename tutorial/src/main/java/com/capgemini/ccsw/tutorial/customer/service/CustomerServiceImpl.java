@@ -64,6 +64,8 @@ public class CustomerServiceImpl implements CustomerService {
 		} else {
 			if (id == null) {
 				customer = new Customer();
+			} else {
+				customer = this.customerRepository.findById(id).orElse(null);
 			}
 		}
 

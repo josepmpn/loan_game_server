@@ -42,8 +42,8 @@ CREATE TABLE LOAN(
     id BIGINT IDENTITY NOT NULL PRIMARY KEY,
     game_id BIGINT NOT NULL,
     customer_id BIGINT NOT NULL,
-    start_date DATE NOT NULL,
-    end_date DATE NOT NULL
+    start_date TIMESTAMP NOT NULL,
+    end_date TIMESTAMP NOT NULL
 );
 
 ALTER TABLE LOAN ADD FOREIGN KEY (game_id) REFERENCES GAME(id);
